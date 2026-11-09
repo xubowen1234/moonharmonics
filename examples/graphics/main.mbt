@@ -1,4 +1,5 @@
 // Directional radiance -> harmonic projection -> cosine convolution -> irradiance.
+
 ///|
 fn main {
   let grid = @h.SphereGrid::new(6).unwrap()

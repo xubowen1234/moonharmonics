@@ -1,4 +1,5 @@
 // Sampled scalar sphere -> spectrum -> heat smoothing and zero-mean Poisson potential.
+
 ///|
 fn main {
   let grid = @h.SphereGrid::new(8).unwrap()

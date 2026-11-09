@@ -1,5 +1,6 @@
 // Offline directional scene coefficients -> active z rotation -> evaluated directional field.
 // This demonstrates a finite angular expansion, not an audio device or HRTF renderer.
+
 ///|
 fn main {
   let front = @h.Direction::new(@math.PI / 2.0, 0.0).unwrap()
