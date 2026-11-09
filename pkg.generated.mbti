@@ -1,0 +1,173 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "xubowen1234/moonharmonics"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub const MAX_DEGREE : Int32 = 64
+
+pub fn basis_band_norm(Int32, Direction) -> Result[Double, HarmonicError]
+
+pub fn coefficient_count(Int32) -> Result[Int32, HarmonicError]
+
+pub fn coefficient_index(Int32, Int32) -> Result[Int32, HarmonicError]
+
+pub fn degree_order(Int32) -> Result[(Int32, Int32), HarmonicError]
+
+pub fn encode_direction(Int32, Direction, Double) -> Result[Spectrum, HarmonicError]
+
+pub fn fit_weighted(Int32, Array[Direction], Array[Double], Array[Double], rank_tolerance? : Double) -> Result[FitResult, HarmonicError]
+
+pub fn gauss_legendre(Int32) -> Result[Quadrature, HarmonicError]
+
+pub fn normalized_legendre(Int32, Double) -> Result[Array[Double], HarmonicError]
+
+pub fn real_basis(Int32, Direction) -> Result[Array[Double], HarmonicError]
+
+pub fn real_harmonic(Int32, Int32, Direction) -> Result[Double, HarmonicError]
+
+// Errors
+
+// Types and methods
+pub struct Direction {
+  theta : Double
+  phi : Double
+}
+pub fn Direction::cartesian(Self) -> (Double, Double, Double)
+pub fn Direction::distance(Self, Self) -> Double
+pub fn Direction::from_cartesian(Double, Double, Double) -> Result[Self, HarmonicError]
+pub fn Direction::new(Double, Double) -> Result[Self, HarmonicError]
+pub fn Direction::phi(Self) -> Double
+pub fn Direction::theta(Self) -> Double
+
+pub struct FitResult {
+  spectrum : Spectrum
+  weighted_rms : Double
+  rank : Int32
+  diagonal_ratio : Double
+}
+pub fn FitResult::diagonal_ratio(Self) -> Double
+pub fn FitResult::rank(Self) -> Int32
+pub fn FitResult::spectrum(Self) -> Spectrum
+pub fn FitResult::weighted_rms(Self) -> Double
+
+pub(all) enum HarmonicError {
+  InvalidDegree(Int32)
+  InvalidOrder(Int32, Int32)
+  InvalidInput(String)
+  ShapeMismatch(Int32, Int32)
+  SingularSystem(Int32)
+} derive(Eq, @debug.Debug)
+pub fn HarmonicError::equal(Self, Self) -> Bool
+pub fn HarmonicError::not_equal(Self, Self) -> Bool
+pub fn HarmonicError::to_repr(Self) -> @debug.Repr
+
+pub struct ProjectionAccumulator {
+  degree : Int32
+  sums : Array[Double]
+  corrections : Array[Double]
+  mut weight : Double
+  mut weight_correction : Double
+  mut samples : Int32
+}
+pub fn ProjectionAccumulator::merge(Self, Self) -> Result[Unit, HarmonicError]
+pub fn ProjectionAccumulator::new(Int32) -> Result[Self, HarmonicError]
+pub fn ProjectionAccumulator::push(Self, Direction, Double, Double) -> Result[Unit, HarmonicError]
+pub fn ProjectionAccumulator::samples(Self) -> Int32
+pub fn ProjectionAccumulator::spectrum(Self) -> Result[Spectrum, HarmonicError]
+pub fn ProjectionAccumulator::weight(Self) -> Double
+
+pub struct Quadrature {
+  nodes : Array[Double]
+  weights : Array[Double]
+}
+pub fn Quadrature::integrate(Self, Array[Double]) -> Result[Double, HarmonicError]
+pub fn Quadrature::nodes(Self) -> Array[Double]
+pub fn Quadrature::size(Self) -> Int32
+pub fn Quadrature::weights(Self) -> Array[Double]
+
+pub struct Spectrum {
+  degree : Int32
+  coefficients : Array[Double]
+}
+pub fn Spectrum::add(Self, Self) -> Result[Self, HarmonicError]
+pub fn Spectrum::band_power(Self) -> Result[Array[Double], HarmonicError]
+pub fn Spectrum::bandpass(Self, Int32, Int32) -> Result[Self, HarmonicError]
+pub fn Spectrum::coefficient(Self, Int32, Int32) -> Result[Double, HarmonicError]
+pub fn Spectrum::convolve(Self, ZonalKernel) -> Result[Self, HarmonicError]
+pub fn Spectrum::cosine_taper(Self, Int32, Int32) -> Result[Self, HarmonicError]
+pub fn Spectrum::degree(Self) -> Int32
+pub fn Spectrum::differentiate_phi(Self) -> Result[Self, HarmonicError]
+pub fn Spectrum::distance(Self, Self) -> Result[Double, HarmonicError]
+pub fn Spectrum::energy(Self) -> Result[Double, HarmonicError]
+pub fn Spectrum::evaluate(Self, Direction) -> Result[Double, HarmonicError]
+pub fn Spectrum::evaluate_many(Self, Array[Direction]) -> Result[Array[Double], HarmonicError]
+pub fn Spectrum::filter_bands(Self, Array[Double]) -> Result[Self, HarmonicError]
+pub fn Spectrum::from_json(Json) -> Result[Self, HarmonicError]
+pub fn Spectrum::from_json_string(String) -> Result[Self, HarmonicError]
+pub fn Spectrum::from_sn3d(Int32, Array[Double]) -> Result[Self, HarmonicError]
+pub fn Spectrum::gradient(Self, Direction) -> Result[TangentGradient, HarmonicError]
+pub fn Spectrum::gradient_energy(Self) -> Result[Double, HarmonicError]
+pub fn Spectrum::heat(Self, Double) -> Result[Self, HarmonicError]
+pub fn Spectrum::laplacian(Self) -> Result[Self, HarmonicError]
+pub fn Spectrum::mean(Self) -> Double
+pub fn Spectrum::new(Int32, Array[Double]) -> Result[Self, HarmonicError]
+pub fn Spectrum::parseval_defect(Self, SphereGrid, Array[Double]) -> Result[Double, HarmonicError]
+pub fn Spectrum::poisson(Self, Double) -> Result[Self, HarmonicError]
+pub fn Spectrum::resize(Self, Int32) -> Result[Self, HarmonicError]
+pub fn Spectrum::rms(Self) -> Result[Double, HarmonicError]
+pub fn Spectrum::rotate_z(Self, Double) -> Result[Self, HarmonicError]
+pub fn Spectrum::scale(Self, Double) -> Result[Self, HarmonicError]
+pub fn Spectrum::screened_poisson(Self, Double) -> Result[Self, HarmonicError]
+pub fn Spectrum::size(Self) -> Int32
+pub fn Spectrum::synthesize(Self, SphereGrid) -> Result[Array[Double], HarmonicError]
+pub fn Spectrum::to_json(Self) -> Json
+pub fn Spectrum::to_json_string(Self) -> String
+pub fn Spectrum::to_sn3d(Self) -> Result[Array[Double], HarmonicError]
+pub fn Spectrum::values(Self) -> Array[Double]
+pub fn Spectrum::with_coefficient(Self, Int32, Int32, Double) -> Result[Self, HarmonicError]
+pub fn Spectrum::without_mean(Self) -> Self
+pub fn Spectrum::zeros(Int32) -> Result[Self, HarmonicError]
+
+pub struct SphereGrid {
+  degree : Int32
+  quadrature : Quadrature
+  nphi : Int32
+}
+pub fn SphereGrid::analyze(Self, Array[Double]) -> Result[Spectrum, HarmonicError]
+pub fn SphereGrid::degree(Self) -> Int32
+pub fn SphereGrid::direction(Self, Int32) -> Result[Direction, HarmonicError]
+pub fn SphereGrid::inner_product(Self, Array[Double], Array[Double]) -> Result[Double, HarmonicError]
+pub fn SphereGrid::integrate(Self, Array[Double]) -> Result[Double, HarmonicError]
+pub fn SphereGrid::longitudes(Self) -> Int32
+pub fn SphereGrid::new(Int32) -> Result[Self, HarmonicError]
+pub fn SphereGrid::oversampled(Int32, Int32, Int32) -> Result[Self, HarmonicError]
+pub fn SphereGrid::project(Self, (Direction) -> Double) -> Result[Spectrum, HarmonicError]
+pub fn SphereGrid::rings(Self) -> Int32
+pub fn SphereGrid::sample(Self, (Direction) -> Double) -> Result[Array[Double], HarmonicError]
+pub fn SphereGrid::size(Self) -> Int32
+pub fn SphereGrid::weight(Self, Int32) -> Result[Double, HarmonicError]
+
+pub struct TangentGradient {
+  x : Double
+  y : Double
+  z : Double
+}
+pub fn TangentGradient::components(Self) -> (Double, Double, Double)
+pub fn TangentGradient::norm(Self) -> Double
+
+pub struct ZonalKernel {
+  gains : Array[Double]
+}
+pub fn ZonalKernel::degree(Self) -> Int32
+pub fn ZonalKernel::from_zonal_coefficients(Array[Double]) -> Result[Self, HarmonicError]
+pub fn ZonalKernel::gains(Self) -> Array[Double]
+pub fn ZonalKernel::lambertian(Int32) -> Result[Self, HarmonicError]
+pub fn ZonalKernel::new(Array[Double]) -> Result[Self, HarmonicError]
+pub fn ZonalKernel::project(Int32, Int32, (Double) -> Double) -> Result[Self, HarmonicError]
+
+// Type aliases
+
+// Traits
