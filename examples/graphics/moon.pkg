@@ -1,0 +1,6 @@
+import {
+  "xubowen1234/moonharmonics" @h,
+  "moonbitlang/core/math",
+}
+
+pkgtype(kind: "executable")
