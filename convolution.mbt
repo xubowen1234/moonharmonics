@@ -1,7 +1,7 @@
 ///|
 /// Zonal kernel represented by degree multipliers k_l=2pi*integral K(t)P_l(t)dt.
 pub struct ZonalKernel {
-  gains : Array[Double]
+  priv gains : Array[Double]
 }
 
 ///|

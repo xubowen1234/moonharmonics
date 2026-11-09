@@ -2,9 +2,9 @@
 /// Tensor quadrature: ascending cos(theta) rings and increasing uniform longitude.
 /// Flat index is ring*nphi+longitude. All sample arrays use exactly this order.
 pub struct SphereGrid {
-  degree : Int32
-  quadrature : Quadrature
-  nphi : Int32
+  priv degree : Int32
+  priv quadrature : Quadrature
+  priv nphi : Int32
 }
 
 ///|

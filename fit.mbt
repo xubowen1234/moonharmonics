@@ -1,10 +1,10 @@
 ///|
 /// Result of a full-rank weighted least-squares solve using column-pivoted Householder QR.
 pub struct FitResult {
-  spectrum : Spectrum
-  weighted_rms : Double
-  rank : Int32
-  diagonal_ratio : Double
+  priv spectrum : Spectrum
+  priv weighted_rms : Double
+  priv rank : Int32
+  priv diagonal_ratio : Double
 }
 
 ///|

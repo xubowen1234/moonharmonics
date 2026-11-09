@@ -1,8 +1,8 @@
 ///|
 /// Nodes and weights for integrating a scalar function on [-1,1].
 pub struct Quadrature {
-  nodes : Array[Double]
-  weights : Array[Double]
+  priv nodes : Array[Double]
+  priv weights : Array[Double]
 }
 
 ///|

@@ -1,9 +1,9 @@
 ///|
 /// Cartesian tangent gradient on the unit sphere; unlike coordinate derivatives it is defined at poles.
 pub struct TangentGradient {
-  x : Double
-  y : Double
-  z : Double
+  priv x : Double
+  priv y : Double
+  priv z : Double
 }
 
 ///|

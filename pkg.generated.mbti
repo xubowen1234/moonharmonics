@@ -32,8 +32,7 @@ pub fn real_harmonic(Int32, Int32, Direction) -> Result[Double, HarmonicError]
 
 // Types and methods
 pub struct Direction {
-  theta : Double
-  phi : Double
+  // private fields
 }
 pub fn Direction::cartesian(Self) -> (Double, Double, Double)
 pub fn Direction::distance(Self, Self) -> Double
@@ -43,10 +42,7 @@ pub fn Direction::phi(Self) -> Double
 pub fn Direction::theta(Self) -> Double
 
 pub struct FitResult {
-  spectrum : Spectrum
-  weighted_rms : Double
-  rank : Int32
-  diagonal_ratio : Double
+  // private fields
 }
 pub fn FitResult::diagonal_ratio(Self) -> Double
 pub fn FitResult::rank(Self) -> Int32
@@ -65,12 +61,7 @@ pub fn HarmonicError::not_equal(Self, Self) -> Bool
 pub fn HarmonicError::to_repr(Self) -> @debug.Repr
 
 pub struct ProjectionAccumulator {
-  degree : Int32
-  sums : Array[Double]
-  corrections : Array[Double]
-  mut weight : Double
-  mut weight_correction : Double
-  mut samples : Int32
+  // private fields
 }
 pub fn ProjectionAccumulator::merge(Self, Self) -> Result[Unit, HarmonicError]
 pub fn ProjectionAccumulator::new(Int32) -> Result[Self, HarmonicError]
@@ -80,8 +71,7 @@ pub fn ProjectionAccumulator::spectrum(Self) -> Result[Spectrum, HarmonicError]
 pub fn ProjectionAccumulator::weight(Self) -> Double
 
 pub struct Quadrature {
-  nodes : Array[Double]
-  weights : Array[Double]
+  // private fields
 }
 pub fn Quadrature::integrate(Self, Array[Double]) -> Result[Double, HarmonicError]
 pub fn Quadrature::nodes(Self) -> Array[Double]
@@ -89,8 +79,7 @@ pub fn Quadrature::size(Self) -> Int32
 pub fn Quadrature::weights(Self) -> Array[Double]
 
 pub struct Spectrum {
-  degree : Int32
-  coefficients : Array[Double]
+  // private fields
 }
 pub fn Spectrum::add(Self, Self) -> Result[Self, HarmonicError]
 pub fn Spectrum::band_power(Self) -> Result[Array[Double], HarmonicError]
@@ -132,9 +121,7 @@ pub fn Spectrum::without_mean(Self) -> Self
 pub fn Spectrum::zeros(Int32) -> Result[Self, HarmonicError]
 
 pub struct SphereGrid {
-  degree : Int32
-  quadrature : Quadrature
-  nphi : Int32
+  // private fields
 }
 pub fn SphereGrid::analyze(Self, Array[Double]) -> Result[Spectrum, HarmonicError]
 pub fn SphereGrid::degree(Self) -> Int32
@@ -151,15 +138,13 @@ pub fn SphereGrid::size(Self) -> Int32
 pub fn SphereGrid::weight(Self, Int32) -> Result[Double, HarmonicError]
 
 pub struct TangentGradient {
-  x : Double
-  y : Double
-  z : Double
+  // private fields
 }
 pub fn TangentGradient::components(Self) -> (Double, Double, Double)
 pub fn TangentGradient::norm(Self) -> Double
 
 pub struct ZonalKernel {
-  gains : Array[Double]
+  // private fields
 }
 pub fn ZonalKernel::degree(Self) -> Int32
 pub fn ZonalKernel::from_zonal_coefficients(Array[Double]) -> Result[Self, HarmonicError]

@@ -3,12 +3,12 @@
 /// Weights represent solid-angle quadrature, not statistical confidence weights.
 /// Arbitrary samples do not imply exact orthogonality; use fit_weighted for regression.
 pub struct ProjectionAccumulator {
-  degree : Int32
-  sums : Array[Double]
-  corrections : Array[Double]
-  mut weight : Double
-  mut weight_correction : Double
-  mut samples : Int32
+  priv degree : Int32
+  priv sums : Array[Double]
+  priv corrections : Array[Double]
+  priv mut weight : Double
+  priv mut weight_correction : Double
+  priv mut samples : Int32
 }
 
 ///|

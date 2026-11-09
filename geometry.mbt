@@ -1,8 +1,8 @@
 ///|
 /// A point on the unit sphere: colatitude theta in [0,pi], longitude phi in [0,2pi).
 pub struct Direction {
-  theta : Double
-  phi : Double
+  priv theta : Double
+  priv phi : Double
 }
 
 ///|

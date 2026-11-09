@@ -1,8 +1,8 @@
 ///|
 /// Immutable complete real spectrum. Constructors copy arrays; accessors never expose storage.
 pub struct Spectrum {
-  degree : Int32
-  coefficients : Array[Double]
+  priv degree : Int32
+  priv coefficients : Array[Double]
 }
 
 ///|
