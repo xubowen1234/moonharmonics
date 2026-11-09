@@ -62,3 +62,9 @@ WARC：5/5/5/1/4/5/4/4=33；VCD：4/4/5/1/4/5/4/4=31；Avro：5/5/5/1/5/5/3/3=32
 验收在后续质量文档记录实测值，不把预定目标写成已完成结果。
 
 结论：**在已记录检索范围内未发现成熟直接替代。** 未索引、私有、离线、不同标签或检索上限外项目不能排除；发布前再反向复核核心行为。
+
+## 2026-11-09 发布前复核
+
+再次执行 moon search spherical/harmonics（limit=100）及三组 GitHub 语义仓库检索，并重新读取注册表。本次新检出 chenliyi-cly/moonhealpix@0.1.0（https://github.com/chenliyi-cly/moonhealpix），检查其中文 README、完整公开接口、源码树、maps.mbt、resample.mbt 和 workflows_wbtest.mbt。其核心为 HEALPix RING/NESTED 像素索引、目录检索、地图重排/均值或求和重采样及统计，README 明确不实现球谐变换；源码和测试中未见本项目的正交系数分析/合成、球面谱 Poisson 或核卷积流程。双方可通过球面采样集成，但网格、数据模型及主要任务不同。作为 external-checked 相邻项目登记，未据此扩张本项目功能。
+
+GitHub 的 spherical harmonics、sphere+spectral、ambisonics 加 language:MoonBit 检索本轮均返回 0，不能排除未索引项目；本次复核仍仅支持：在已记录检索范围内未发现成熟直接替代。
