@@ -15,7 +15,7 @@ fn main {
   if (before - after).abs() > 1.0e-12 {
     abort("active directional rotation mismatch")
   }
-  let interoperable = rotated.to_sn3d()
+  let interoperable = rotated.to_sn3d().unwrap()
   let restored = @h.Spectrum::from_sn3d(3, interoperable).unwrap()
   if restored.distance(rotated).unwrap() > 1.0e-12 {
     abort("SN3D convention round trip mismatch")

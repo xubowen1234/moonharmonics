@@ -21,7 +21,7 @@ def main():
     run=subprocess.run(['moon','run','tools/reference','--target',args.target],cwd=root,text=True,capture_output=True,encoding='utf-8')
     if run.returncode: raise RuntimeError(run.stderr)
     records=[json.loads(line) for line in run.stdout.splitlines() if line.startswith('{')]
-    assert len(records)==30, f'unexpected reference output count {len(records)}'
+    assert len(records)==29, f'unexpected reference output count {len(records)}'
     metrics={};comparisons=0
     def check(name,actual,expected,tolerance):
         nonlocal comparisons

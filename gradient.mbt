@@ -37,7 +37,7 @@ pub fn Spectrum::gradient(
 ) -> Result[TangentGradient, HarmonicError] {
   let x = @math.cos(direction.theta)
   let s = @math.sin(direction.theta)
-  if direction.theta == 0.0 || direction.theta == @math.PI {
+  if direction.theta < 1.0e-150 || direction.theta == @math.PI {
     let mut gx = 0.0
     let mut gy = 0.0
     for l = 1; l <= self.degree; l = l + 1 {

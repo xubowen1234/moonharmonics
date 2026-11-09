@@ -25,7 +25,7 @@ test "versioned JSON is reversible and rejects ambiguous inputs" {
     ),
   )
   close(
-    Spectrum::from_sn3d(1, s.to_sn3d()).unwrap().distance(s).unwrap(),
+    Spectrum::from_sn3d(1, s.to_sn3d().unwrap()).unwrap().distance(s).unwrap(),
     0.0,
     2.0e-15,
   )

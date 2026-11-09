@@ -102,7 +102,9 @@ pub fn Spectrum::from_sn3d(
 
 ///|
 /// Expansion coefficients for phase-free SN3D, with identical signed-order indexing.
-pub fn Spectrum::to_sn3d(self : Spectrum) -> Array[Double] {
+pub fn Spectrum::to_sn3d(
+  self : Spectrum,
+) -> Result[Array[Double], HarmonicError] {
   let values = self.values()
   for l = 0; l <= self.degree; l = l + 1 {
     let factor = ((2 * l + 1).to_double() / (4.0 * @math.PI)).sqrt()
@@ -112,5 +114,10 @@ pub fn Spectrum::to_sn3d(self : Spectrum) -> Array[Double] {
       values[i] = values[i] * factor * sign
     }
   }
-  values
+  for value in values {
+    if !finite(value) {
+      return Err(InvalidInput("SN3D conversion overflow"))
+    }
+  }
+  Ok(values)
 }
