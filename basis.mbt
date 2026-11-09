@@ -5,10 +5,14 @@ pub fn real_basis(
   degree : Int32,
   direction : Direction,
 ) -> Result[Array[Double], HarmonicError] {
-  let q = match normalized_legendre(degree, @math.cos(direction.theta)) {
-    Ok(v) => v
-    Err(e) => return Err(e)
+  if !valid_degree(degree) {
+    return Err(InvalidDegree(degree))
   }
+  let q = legendre_factors(
+    degree,
+    @math.cos(direction.theta),
+    @math.sin(direction.theta),
+  )
   let root_two = 2.0.sqrt()
   for m = 1; m <= degree; m = m + 1 {
     let angle = m.to_double() * direction.phi

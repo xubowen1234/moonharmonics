@@ -12,9 +12,17 @@ pub fn normalized_legendre(
   if !finite(x) || x < -1.0 || x > 1.0 {
     return Err(InvalidInput("Legendre argument outside [-1,1]"))
   }
+  Ok(
+    legendre_factors(degree, x, @cmp.maximum(0.0, (1.0 - x) * (1.0 + x)).sqrt()),
+  )
+}
+
+// Supplying sine directly preserves relative precision in angular derivatives near poles.
+
+///|
+fn legendre_factors(degree : Int32, x : Double, s : Double) -> Array[Double] {
   let values = Array::make((degree + 1) * (degree + 1), 0.0)
   values[0] = 1.0 / (4.0 * @math.PI).sqrt()
-  let s = @cmp.maximum(0.0, (1.0 - x) * (1.0 + x)).sqrt()
   for m = 0; m <= degree; m = m + 1 {
     if m > 0 {
       let md = m.to_double()
@@ -39,5 +47,5 @@ pub fn normalized_legendre(
         b * values[index_of(l - 2, m)]
     }
   }
-  Ok(values)
+  values
 }
