@@ -79,7 +79,7 @@ let persisted = @h.Spectrum::from_json_string(field.to_json_string()).unwrap()
 
 `fit_weighted(L, directions, values, weights)` 求最小化 `sum w_i*(f_i-y_i)^2`。支持 `L<=12`、最多 4096 行，权重有限且非负。QR 对秩不足返回 `SingularSystem`，不返回伪逆最小范数解。`diagonal_ratio()` 是 QR 对角线比值诊断，不是严格条件数。用于统计拟合的权重和流式投影的立体角权重具有不同含义。
 
-`from_convention` / `to_convention` 显式选择 `Orthonormal`、`FourPi`、`Schmidt`，`CondonShortley` / `PhaseFree`，以及 `Signed`、`Interleaved`、`CosineThenSine` 排列。`FourPi + PhaseFree + Signed` 对应 N3D/ACN，`Schmidt + PhaseFree + Signed` 对应 SN3D/ACN。旧接口 `to_sn3d()` 返回无 CS 相位的 SN3D **展开系数**，不是基函数采样值；打包次序保持不变。JSON 固定格式 `moonharmonics-real-v1`，携带 `orthonormal-cs-l*l+l+m` 约定，拒绝重复键、未知字段及错误形状。可交换格式详情见 [docs/format.md](docs/format.md)，旋转算法、因子方向和排列示例见 [docs/rotations-and-conventions.md](docs/rotations-and-conventions.md)。
+`from_convention` / `to_convention` 显式选择 `Orthonormal`、`FourPi`、`Schmidt`，`CondonShortley` / `PhaseFree`，以及 `Signed`、`Interleaved`、`CosineThenSine` 排列。`FourPi + PhaseFree + Signed` 对应 N3D/ACN，`Schmidt + PhaseFree + Signed` 对应 SN3D/ACN。旧接口 `to_sn3d()` 返回无 CS 相位的 SN3D **展开系数**，不是基函数采样值；打包次序保持不变。JSON 固定格式 `moonharmonics-real-v1`，携带 `orthonormal-cs-l*l+l+m` 约定，拒绝重复键、未知字段及错误形状。可交换格式详情见 [docs/format.md](https://github.com/xubowen1234/moonharmonics/blob/v0.2.0/docs/format.md)，旋转算法、因子方向和排列示例见 [docs/rotations-and-conventions.md](https://github.com/xubowen1234/moonharmonics/blob/v0.2.0/docs/rotations-and-conventions.md)。
 
 ## 三个可运行工作流
 
@@ -114,7 +114,7 @@ python -m pip install numpy==2.3.4 scipy==1.16.3
 python scripts/reference_check.py --target wasm-gc
 ```
 
-它独立比较 64 阶实基、256 节点求积、16 阶正反变换、解析导数、64 阶 Lambertian 系数和带噪声加权拟合，并用独立三维旋转后的 SciPy 球谐验证 64 阶旋转，使用稠密 Padé 矩阵指数对照最高阶系数，逐项验证 18 种约定的导入与导出。每个后端执行 110,707 次标量比较。拟合参考使用 SVD，区别于本库 QR。脚本打印实际比较数量及最大绝对误差；阈值和输入在脚本中固定，不能用一次往返测试替代独立参考。
+它独立比较 64 阶实基、256 节点求积、16 阶正反变换、解析导数、64 阶 Lambertian 系数和带噪声加权拟合，并用独立三维旋转后的 SciPy 球谐验证 64 阶旋转，使用稠密 Padé 矩阵指数对照最高阶系数，逐项验证 18 种约定的导入与导出。每个后端执行 110,707 次标量比较。拟合参考使用 SVD，区别于本库 QR。脚本打印实际比较数量及最大绝对误差；阈值和输入在脚本中固定，不能用一次往返测试替代独立参考。详细输入与实测误差见 [数值验证说明](https://github.com/xubowen1234/moonharmonics/blob/v0.2.0/docs/numerical-validation.md)。
 
 ## 边界、复杂度与许可
 
