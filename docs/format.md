@@ -11,3 +11,5 @@ JSON 根对象必须恰有 `format`、`convention`、`degree`、`coefficients` �
 SN3D 互操作函数使用相同打包顺序及不含 CS 相位的半归一基：`S_lm=(-1)^|m|*sqrt(4*pi/(2*l+1))*R_lm`。故 SN3D 展开系数乘这个因子才得到本库展开系数。对基函数数值的转换方向相反。不得在基值与系数之间混用同一因子。
 
 不接受自动推断归一化、未知版本或截断数组。版本 1 是本项目可交换格式，不声称属于既有标准协议。
+
+通用转换另外提供 `from_convention` / `to_convention`，支持三种归一化、两种相位和三种排列；其数学因子及 N3D/SN3D 对应见 [空间旋转与系数互操作](rotations-and-conventions.md)。导入外部约定后才能序列化为上述规范 JSON，版本 1 不接受不同 convention 标签。
