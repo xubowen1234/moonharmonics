@@ -31,6 +31,15 @@ pub fn real_harmonic(Int32, Int32, Direction) -> Result[Double, HarmonicError]
 // Errors
 
 // Types and methods
+pub(all) enum CoefficientOrder {
+  Signed
+  Interleaved
+  CosineThenSine
+} derive(Eq, @debug.Debug)
+pub fn CoefficientOrder::equal(Self, Self) -> Bool
+pub fn CoefficientOrder::not_equal(Self, Self) -> Bool
+pub fn CoefficientOrder::to_repr(Self) -> @debug.Repr
+
 pub struct Direction {
   // private fields
 }
@@ -39,6 +48,7 @@ pub fn Direction::distance(Self, Self) -> Double
 pub fn Direction::from_cartesian(Double, Double, Double) -> Result[Self, HarmonicError]
 pub fn Direction::new(Double, Double) -> Result[Self, HarmonicError]
 pub fn Direction::phi(Self) -> Double
+pub fn Direction::rotate_zyz(Self, Double, Double, Double) -> Result[Self, HarmonicError]
 pub fn Direction::theta(Self) -> Double
 
 pub struct FitResult {
@@ -59,6 +69,23 @@ pub(all) enum HarmonicError {
 pub fn HarmonicError::equal(Self, Self) -> Bool
 pub fn HarmonicError::not_equal(Self, Self) -> Bool
 pub fn HarmonicError::to_repr(Self) -> @debug.Repr
+
+pub(all) enum HarmonicPhase {
+  CondonShortley
+  PhaseFree
+} derive(Eq, @debug.Debug)
+pub fn HarmonicPhase::equal(Self, Self) -> Bool
+pub fn HarmonicPhase::not_equal(Self, Self) -> Bool
+pub fn HarmonicPhase::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Normalization {
+  Orthonormal
+  FourPi
+  Schmidt
+} derive(Eq, @debug.Debug)
+pub fn Normalization::equal(Self, Self) -> Bool
+pub fn Normalization::not_equal(Self, Self) -> Bool
+pub fn Normalization::to_repr(Self) -> @debug.Repr
 
 pub struct ProjectionAccumulator {
   // private fields
@@ -94,6 +121,7 @@ pub fn Spectrum::energy(Self) -> Result[Double, HarmonicError]
 pub fn Spectrum::evaluate(Self, Direction) -> Result[Double, HarmonicError]
 pub fn Spectrum::evaluate_many(Self, Array[Direction]) -> Result[Array[Double], HarmonicError]
 pub fn Spectrum::filter_bands(Self, Array[Double]) -> Result[Self, HarmonicError]
+pub fn Spectrum::from_convention(Int32, Array[Double], Normalization, HarmonicPhase, CoefficientOrder) -> Result[Self, HarmonicError]
 pub fn Spectrum::from_json(Json) -> Result[Self, HarmonicError]
 pub fn Spectrum::from_json_string(String) -> Result[Self, HarmonicError]
 pub fn Spectrum::from_sn3d(Int32, Array[Double]) -> Result[Self, HarmonicError]
@@ -107,11 +135,14 @@ pub fn Spectrum::parseval_defect(Self, SphereGrid, Array[Double]) -> Result[Doub
 pub fn Spectrum::poisson(Self, Double) -> Result[Self, HarmonicError]
 pub fn Spectrum::resize(Self, Int32) -> Result[Self, HarmonicError]
 pub fn Spectrum::rms(Self) -> Result[Double, HarmonicError]
+pub fn Spectrum::rotate_y(Self, Double) -> Result[Self, HarmonicError]
 pub fn Spectrum::rotate_z(Self, Double) -> Result[Self, HarmonicError]
+pub fn Spectrum::rotate_zyz(Self, Double, Double, Double) -> Result[Self, HarmonicError]
 pub fn Spectrum::scale(Self, Double) -> Result[Self, HarmonicError]
 pub fn Spectrum::screened_poisson(Self, Double) -> Result[Self, HarmonicError]
 pub fn Spectrum::size(Self) -> Int32
 pub fn Spectrum::synthesize(Self, SphereGrid) -> Result[Array[Double], HarmonicError]
+pub fn Spectrum::to_convention(Self, Normalization, HarmonicPhase, CoefficientOrder) -> Result[Array[Double], HarmonicError]
 pub fn Spectrum::to_json(Self) -> Json
 pub fn Spectrum::to_json_string(Self) -> String
 pub fn Spectrum::to_sn3d(Self) -> Result[Array[Double], HarmonicError]

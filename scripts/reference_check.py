@@ -2,7 +2,8 @@
 import argparse, json, math, os, pathlib, subprocess
 import numpy as np
 from scipy.special import sph_harm_y, roots_legendre, eval_legendre
-from scipy.linalg import lstsq
+from scipy.linalg import lstsq, expm
+from scipy.spatial.transform import Rotation
 
 def basis(degree, theta, phi):
     result=[]
@@ -21,7 +22,7 @@ def main():
     run=subprocess.run(['moon','run','tools/reference','--target',args.target],cwd=root,text=True,capture_output=True,encoding='utf-8')
     if run.returncode: raise RuntimeError(run.stderr)
     records=[json.loads(line) for line in run.stdout.splitlines() if line.startswith('{')]
-    assert len(records)==29, f'unexpected reference output count {len(records)}'
+    assert len(records)==54, f'unexpected reference output count {len(records)}'
     metrics={};comparisons=0
     def check(name,actual,expected,tolerance):
         nonlocal comparisons
@@ -78,8 +79,57 @@ def main():
             rms=math.sqrt(np.dot(weight,(b@expected-values)**2)/sum(weight))
             check('fit_coefficients',v[0],expected,2e-12)
             check('fit_weighted_rms',v[1],rms,2e-13)
+        elif kind in ('so3_encoding','so3_field'):
+            a,b,g=v[0][:3]
+            rotation=(Rotation.from_rotvec([0,0,a])*Rotation.from_rotvec([0,b,0])*Rotation.from_rotvec([0,0,g]))
+            def angles(cartesian):
+                return np.arctan2(np.hypot(cartesian[...,0],cartesian[...,1]),cartesian[...,2]), np.arctan2(cartesian[...,1],cartesian[...,0])
+            if kind=='so3_encoding':
+                t,p=v[0][3:]
+                d=rotation.apply([math.sin(t)*math.cos(p),math.sin(t)*math.sin(p),math.cos(t)])
+                rt,rp=angles(d)
+                check(kind,v[1],basis(64,rt,rp),5e-10)
+                t2,p2=v[2]
+                check('so3_direction',[math.sin(t2)*math.cos(p2),math.sin(t2)*math.sin(p2),math.cos(t2)],d,3e-14)
+            else:
+                samples=np.asarray(v[2]);t=samples[:,0];p=samples[:,1]
+                points=np.column_stack([np.sin(t)*np.cos(p),np.sin(t)*np.sin(p),np.cos(t)])
+                it,ip=angles(rotation.inv().apply(points))
+                canonical=np.sin(np.arange(1,4226))/np.arange(1,4226)
+                check('so3_field_values',samples[:,2],basis(64,it,ip)@canonical,5e-11)
+                check('so3_field_output_basis',samples[:,2],basis(64,t,p)@np.asarray(v[1]),5e-11)
+                # Independent dense Pade expm (not the library's stepped Taylor action).
+                l=64;m=np.arange(-l,l+1);band=canonical[l*l:(l+1)**2]
+                ac=np.zeros(2*l+1,dtype=complex);ac[l]=band[l]
+                for k in range(1,l+1):
+                    ac[l+k]=(band[l+k]-1j*band[l-k])/math.sqrt(2)
+                    ac[l-k]=(-1.)**k*np.conj(ac[l+k])
+                edge=.5*np.sqrt((l-m[:-1])*(l+m[:-1]+1))
+                generator=np.diag(edge,1)-np.diag(edge,-1)
+                ac=np.exp(-1j*m*a)*(expm(b*generator)@(np.exp(-1j*m*g)*ac))
+                expected=np.empty(2*l+1);expected[l]=ac[l].real
+                for k in range(1,l+1):
+                    expected[l+k]=math.sqrt(2)*ac[l+k].real
+                    expected[l-k]=-math.sqrt(2)*ac[l+k].imag
+                check('so3_band64_pade',v[1][l*l:(l+1)**2],expected,2e-13)
+                actual_energy=[np.dot(np.asarray(v[1])[j*j:(j+1)**2],np.asarray(v[1])[j*j:(j+1)**2]) for j in range(65)]
+                expected_energy=[np.dot(canonical[j*j:(j+1)**2],canonical[j*j:(j+1)**2]) for j in range(65)]
+                check('so3_band_energy',actual_energy,expected_energy,2e-13)
+        elif kind=='convention':
+            ni,pi,oi=map(int,v[0]);canonical=np.sin(np.arange(1,82))/np.arange(1,82)
+            external=np.cos(np.arange(1,82))/np.arange(1,82)
+            exported=np.empty(81);imported=np.empty(81)
+            for l in range(9):
+                order=list(range(-l,l+1)) if oi==0 else ([0]+[m for k in range(1,l+1) for m in (k,-k)] if oi==1 else list(range(l+1))+list(range(-1,-l-1,-1)))
+                factor=1 if ni==0 else math.sqrt(4*math.pi/(1 if ni==1 else 2*l+1))
+                for offset,m in enumerate(order):
+                    i=l*l+l+m;j=l*l+offset;sign=(-1.)**abs(m) if pi else 1
+                    exported[j]=canonical[i]/(factor*sign)
+                    imported[i]=external[j]*factor*sign
+            check('convention_export',v[1],exported,3e-15)
+            check('convention_import',v[2],imported,3e-15)
         else: raise AssertionError(kind)
-    report={'oracle':'SciPy 1.16.3 spherical harmonics, quadrature and SVD least squares','target':args.target,'records':len(records),'scalar_comparisons':int(comparisons),'maximum_absolute_errors':metrics,'passed':True}
+    report={'oracle':'SciPy 1.16.3 spherical harmonics, spatial rotations, Pade matrix exponential, quadrature and SVD least squares','target':args.target,'records':len(records),'scalar_comparisons':int(comparisons),'maximum_absolute_errors':metrics,'passed':True}
     text=json.dumps(report,indent=2)
     if args.output:args.output.write_text(text+'\n',encoding='utf-8')
     print(text)

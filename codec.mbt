@@ -84,20 +84,7 @@ pub fn Spectrum::from_sn3d(
   degree : Int32,
   coefficients : Array[Double],
 ) -> Result[Spectrum, HarmonicError] {
-  let base = match Spectrum::new(degree, coefficients) {
-    Ok(s) => s
-    Err(e) => return Err(e)
-  }
-  let values = base.values()
-  for l = 0; l <= degree; l = l + 1 {
-    let factor = (4.0 * @math.PI / (2 * l + 1).to_double()).sqrt()
-    for m = -l; m <= l; m = m + 1 {
-      let sign = if m % 2 == 0 { 1.0 } else { -1.0 }
-      let i = index_of(l, m)
-      values[i] = values[i] * factor * sign
-    }
-  }
-  Spectrum::new(degree, values)
+  Spectrum::from_convention(degree, coefficients, Schmidt, PhaseFree, Signed)
 }
 
 ///|
@@ -105,19 +92,5 @@ pub fn Spectrum::from_sn3d(
 pub fn Spectrum::to_sn3d(
   self : Spectrum,
 ) -> Result[Array[Double], HarmonicError] {
-  let values = self.values()
-  for l = 0; l <= self.degree; l = l + 1 {
-    let factor = ((2 * l + 1).to_double() / (4.0 * @math.PI)).sqrt()
-    for m = -l; m <= l; m = m + 1 {
-      let sign = if m % 2 == 0 { 1.0 } else { -1.0 }
-      let i = index_of(l, m)
-      values[i] = values[i] * factor * sign
-    }
-  }
-  for value in values {
-    if !finite(value) {
-      return Err(InvalidInput("SN3D conversion overflow"))
-    }
-  }
-  Ok(values)
+  self.to_convention(Schmidt, PhaseFree, Signed)
 }
