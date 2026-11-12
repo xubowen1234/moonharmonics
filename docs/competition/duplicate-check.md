@@ -68,3 +68,13 @@ WARC：5/5/5/1/4/5/4/4=33；VCD：4/4/5/1/4/5/4/4=31；Avro：5/5/5/1/5/5/3/3=32
 再次执行 moon search spherical/harmonics（limit=100）及三组 GitHub 语义仓库检索，并重新读取注册表。本次新检出 chenliyi-cly/moonhealpix@0.1.0（https://github.com/chenliyi-cly/moonhealpix），检查其中文 README、完整公开接口、源码树、maps.mbt、resample.mbt 和 workflows_wbtest.mbt。其核心为 HEALPix RING/NESTED 像素索引、目录检索、地图重排/均值或求和重采样及统计，README 明确不实现球谐变换；源码和测试中未见本项目的正交系数分析/合成、球面谱 Poisson 或核卷积流程。双方可通过球面采样集成，但网格、数据模型及主要任务不同。作为 external-checked 相邻项目登记，未据此扩张本项目功能。
 
 GitHub 的 spherical harmonics、sphere+spectral、ambisonics 加 language:MoonBit 检索本轮均返回 0，不能排除未索引项目；本次复核仍仅支持：在已记录检索范围内未发现成熟直接替代。
+
+## 2026-11-12：0.2.0 能力扩展复核
+
+本次继续既有基础库，增加任意 SO(3) 旋转，以及显式归一化、相位、带内排列的双向转换；上文任意 SO(3) 非目标描述属于 0.1.0 的历史范围，0.2.0 以 README 和旋转约定文档为准。
+
+再次执行 MoonCakes CLI 的 spherical、harmonics、ambisonic、wigner 搜索，每项 limit=100，分别返回 12、17、0、11 个模块；GitHub MoonBit 仓库搜索 spherical harmonics 仅返回本项目，ambisonics 和 Wigner 返回 0。检索结果不等于全部源码检索。重新检查永久注册表中的相关完整指纹，保留 HEALPix、地学谐波、时间谐波、符号数学和空间音频相邻边界。
+
+针对新出现的 Wigner 关键词重新读取 CAIMEOX/symbit 的源码树、spherical_harmonics.mbt 和 symphysics/wigner.mbt。前者仍是符号球谐表达式构造，后者实现精确 3j/6j 等耦合符号及 Clebsch–Gordan 系数，数据模型和工作流不同于对有限阶实球谐场进行主动三维旋转、规范转换及网格分析/合成；不因共同含 Wigner 或 rotation 字样就认定为替代。
+
+本次有限范围复核仍支持：**在已记录检索范围内未发现成熟直接替代。** 保留未索引、标签差异、私有项目及搜索上限的限制，不作绝对唯一性结论。
