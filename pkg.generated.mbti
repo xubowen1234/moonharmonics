@@ -3,6 +3,7 @@ package "xubowen1234/moonharmonics"
 
 import {
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -31,11 +32,12 @@ pub fn real_harmonic(Int32, Int32, Direction) -> Result[Double, HarmonicError]
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum CoefficientOrder {
   Signed
   Interleaved
   CosineThenSine
-} derive(Eq, @debug.Debug)
+}
 pub fn CoefficientOrder::equal(Self, Self) -> Bool
 pub fn CoefficientOrder::not_equal(Self, Self) -> Bool
 pub fn CoefficientOrder::to_repr(Self) -> @debug.Repr
@@ -51,6 +53,21 @@ pub fn Direction::phi(Self) -> Double
 pub fn Direction::rotate_zyz(Self, Double, Double, Double) -> Result[Self, HarmonicError]
 pub fn Direction::theta(Self) -> Double
 
+pub struct DriscollHealyGrid {
+  // private fields
+}
+pub fn DriscollHealyGrid::analyze(Self, Array[Double]) -> Result[Spectrum, HarmonicError]
+pub fn DriscollHealyGrid::degree(Self) -> Int32
+pub fn DriscollHealyGrid::direction(Self, Int32) -> Result[Direction, HarmonicError]
+pub fn DriscollHealyGrid::integrate(Self, Array[Double]) -> Result[Double, HarmonicError]
+pub fn DriscollHealyGrid::longitudes(Self) -> Int32
+pub fn DriscollHealyGrid::new(Int32) -> Result[Self, HarmonicError]
+pub fn DriscollHealyGrid::project(Self, (Direction) -> Double) -> Result[Spectrum, HarmonicError]
+pub fn DriscollHealyGrid::rings(Self) -> Int32
+pub fn DriscollHealyGrid::sample(Self, (Direction) -> Double) -> Result[Array[Double], HarmonicError]
+pub fn DriscollHealyGrid::size(Self) -> Int32
+pub fn DriscollHealyGrid::weight(Self, Int32) -> Result[Double, HarmonicError]
+
 pub struct FitResult {
   // private fields
 }
@@ -59,30 +76,33 @@ pub fn FitResult::rank(Self) -> Int32
 pub fn FitResult::spectrum(Self) -> Spectrum
 pub fn FitResult::weighted_rms(Self) -> Double
 
+#derive(Eq, @debug.Debug)
 pub(all) enum HarmonicError {
   InvalidDegree(Int32)
   InvalidOrder(Int32, Int32)
   InvalidInput(String)
   ShapeMismatch(Int32, Int32)
   SingularSystem(Int32)
-} derive(Eq, @debug.Debug)
+}
 pub fn HarmonicError::equal(Self, Self) -> Bool
 pub fn HarmonicError::not_equal(Self, Self) -> Bool
 pub fn HarmonicError::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum HarmonicPhase {
   CondonShortley
   PhaseFree
-} derive(Eq, @debug.Debug)
+}
 pub fn HarmonicPhase::equal(Self, Self) -> Bool
 pub fn HarmonicPhase::not_equal(Self, Self) -> Bool
 pub fn HarmonicPhase::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Normalization {
   Orthonormal
   FourPi
   Schmidt
-} derive(Eq, @debug.Debug)
+}
 pub fn Normalization::equal(Self, Self) -> Bool
 pub fn Normalization::not_equal(Self, Self) -> Bool
 pub fn Normalization::to_repr(Self) -> @debug.Repr
@@ -122,7 +142,7 @@ pub fn Spectrum::evaluate(Self, Direction) -> Result[Double, HarmonicError]
 pub fn Spectrum::evaluate_many(Self, Array[Direction]) -> Result[Array[Double], HarmonicError]
 pub fn Spectrum::filter_bands(Self, Array[Double]) -> Result[Self, HarmonicError]
 pub fn Spectrum::from_convention(Int32, Array[Double], Normalization, HarmonicPhase, CoefficientOrder) -> Result[Self, HarmonicError]
-pub fn Spectrum::from_json(Json) -> Result[Self, HarmonicError]
+pub fn Spectrum::from_json(@json.Json) -> Result[Self, HarmonicError]
 pub fn Spectrum::from_json_string(String) -> Result[Self, HarmonicError]
 pub fn Spectrum::from_sn3d(Int32, Array[Double]) -> Result[Self, HarmonicError]
 pub fn Spectrum::gradient(Self, Direction) -> Result[TangentGradient, HarmonicError]
@@ -142,8 +162,9 @@ pub fn Spectrum::scale(Self, Double) -> Result[Self, HarmonicError]
 pub fn Spectrum::screened_poisson(Self, Double) -> Result[Self, HarmonicError]
 pub fn Spectrum::size(Self) -> Int32
 pub fn Spectrum::synthesize(Self, SphereGrid) -> Result[Array[Double], HarmonicError]
+pub fn Spectrum::synthesize_dh(Self, DriscollHealyGrid) -> Result[Array[Double], HarmonicError]
 pub fn Spectrum::to_convention(Self, Normalization, HarmonicPhase, CoefficientOrder) -> Result[Array[Double], HarmonicError]
-pub fn Spectrum::to_json(Self) -> Json
+pub fn Spectrum::to_json(Self) -> @json.Json
 pub fn Spectrum::to_json_string(Self) -> String
 pub fn Spectrum::to_sn3d(Self) -> Result[Array[Double], HarmonicError]
 pub fn Spectrum::values(Self) -> Array[Double]

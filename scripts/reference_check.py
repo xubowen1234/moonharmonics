@@ -22,7 +22,7 @@ def main():
     run=subprocess.run(['moon','run','tools/reference','--target',args.target],cwd=root,text=True,capture_output=True,encoding='utf-8')
     if run.returncode: raise RuntimeError(run.stderr)
     records=[json.loads(line) for line in run.stdout.splitlines() if line.startswith('{')]
-    assert len(records)==54, f'unexpected reference output count {len(records)}'
+    assert len(records)==56, f'unexpected reference output count {len(records)}'
     metrics={};comparisons=0
     def check(name,actual,expected,tolerance):
         nonlocal comparisons
@@ -54,6 +54,22 @@ def main():
             x=np.sin(theta)*np.cos(phi);y=np.sin(theta)*np.sin(phi);z=np.cos(theta)
             samples=np.exp(.5*z)+x*y+.2*x
             check(kind,v,matrix.T@(quadrature_weights*samples),2e-12)
+        elif kind in ('dh_analysis','dh_synthesis'):
+            degree=16;n=degree+1
+            theta=np.repeat(np.arange(2*n)*math.pi/(2*n),2*n)
+            phi=np.tile(np.arange(2*n)*math.pi/n,2*n)
+            dh_basis=basis(degree,theta,phi)
+            dh_weights=(2/n)*np.sin(np.arange(2*n)*math.pi/(2*n))*np.asarray([
+                sum(math.sin((2*k+1)*j*math.pi/(2*n))/(2*k+1) for k in range(n))
+                for j in range(2*n)
+            ])
+            sample_weights=np.repeat(dh_weights*math.pi/n,2*n)
+            if kind=='dh_synthesis':
+                check(kind,v,dh_basis@coefficients,3e-12)
+            else:
+                x=np.sin(theta)*np.cos(phi);y=np.sin(theta)*np.sin(phi);z=np.cos(theta)
+                samples=np.exp(.5*z)+x*y+.2*x
+                check(kind,v,dh_basis.T@(sample_weights*samples),3e-12)
         elif kind=='gradient':
             t,p,gx,gy,gz=v
             dt=0.;dp=0.

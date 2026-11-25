@@ -37,6 +37,16 @@ fn main {
     })
     .unwrap()
   emit("analysis", numbers(projection.values()))
+  let dh_grid = @h.DriscollHealyGrid::new(16).unwrap()
+  let dh_synthesis = spectrum.synthesize_dh(dh_grid).unwrap()
+  emit("dh_synthesis", numbers(dh_synthesis))
+  let dh_projection = dh_grid
+    .project(fn(d) {
+      let (x, y, z) = d.cartesian()
+      @math.exp(0.5 * z) + x * y + 0.2 * x
+    })
+    .unwrap()
+  emit("dh_analysis", numbers(dh_projection.values()))
   for theta in [0.2, 1.1, 2.8] {
     let d = @h.Direction::new(theta, 0.7).unwrap()
     let (x, y, z) = spectrum.gradient(d).unwrap().components()

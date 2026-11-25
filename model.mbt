@@ -1,12 +1,13 @@
 ///|
 /// A rejected argument or an operation that cannot satisfy its mathematical contract.
+#derive(Eq, @debug.Debug)
 pub(all) enum HarmonicError {
   InvalidDegree(Int32)
   InvalidOrder(Int32, Int32)
   InvalidInput(String)
   ShapeMismatch(Int32, Int32)
   SingularSystem(Int32)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend HarmonicError with Eq::{equal, not_equal}

@@ -6,12 +6,12 @@ MoonHarmonics 是 MoonBit 的实球谐分析与谱算子库，用于把单位球
 
 ## 环境与安装
 
-本项目使用 `moonc 0.10.18+6c83a7f62`，高于最低的 0.10.16。CI 固定同一官方工具链，覆盖 `wasm-gc`、`wasm`、`js`、Linux `native`。JS 运行需要 Node.js；Windows native 需要 MSVC C++ 工具和 Windows SDK。本机缺少该工具链，不能把 Windows native 构建计为本地通过。
+本项目使用 `moonc 0.10.22+124d61d05`，高于最低的 0.10.16。CI 固定同一官方工具链，覆盖 `wasm-gc`、`wasm`、`js`、Linux `native`。JS 运行需要 Node.js；Windows native 需要 MSVC C++ 工具和 Windows SDK。本机缺少该工具链，不能把 Windows native 构建计为本地通过。
 
-在已有 MoonBit 模块中安装精确版本：
+MoonCakes 当前已发布 `0.1.0`；本文所述 0.2.0 修订（含 DH1）已在本地完成实现和验证，尚未发布。发布版本可安装：
 
 ```sh
-moon add xubowen1234/moonharmonics@0.2.0
+moon add xubowen1234/moonharmonics@0.1.0
 ```
 
 在消费包的 `moon.pkg` 添加：
@@ -44,6 +44,7 @@ fn main {
 - 0–64 阶实球谐、归一化关联 Legendre 稳定递推及明确的有符号阶布局；64 阶共 4225 个系数。
 - 经过验证的球面角度及笛卡尔方向，不可变 `Spectrum`，显式补零、截断和算术运算。
 - Gauss–Legendre × 等间隔经度网格、可分离正反变换、过采样及流式加权投影。
+- Driscoll–Healy DH1 等角网格正反变换；纬度与经度各 2(L+1) 点，带限阶数 0–64。
 - 分阶功率、均值、RMS、Parseval 缺陷、L2 距离和梯度能量。
 - 热方程平滑、带通及余弦渐消、Laplacian、零均值 Poisson 和屏蔽 Poisson 求解。
 - 任意 SO(3) 主动旋转（ZYZ 欧拉角）、方向编码、纬圈对称核卷积、包含高偶数阶的 Lambertian 核。
@@ -73,13 +74,25 @@ let potential = field.poisson(0.0).unwrap()
 let turned = field.rotate_zyz(0.4, 0.8, -1.2).unwrap()
 let irradiance = field.convolve(@h.ZonalKernel::lambertian(8).unwrap()).unwrap()
 let persisted = @h.Spectrum::from_json_string(field.to_json_string()).unwrap()
+let dh = @h.DriscollHealyGrid::new(8).unwrap()
+let equiangular_coefficients = dh.project(fn(d) {
+  let (_, _, z) = d.cartesian()
+  z
+}).unwrap()
+let dh_samples = equiangular_coefficients.synthesize_dh(dh).unwrap()
 ```
+
+`DriscollHealyGrid` 使用 DH1 等间隔网格，节点为 `theta_j=pi*j/N`、`phi_k=2*pi*k/N`，其中 `N=2(L+1)`；按纬圈优先存储，包含北极、不重复存储南极。分析使用 Driscoll–Healy 纬向求积权重，不把等角采样误当作等面积采样。
+
+### 与 SHTOOLS 的能力对照
+
+SHTOOLS 提供 DH 等角与 Gauss–Legendre 网格的球谐展开/重建，也支持复球谐和更广泛的地学分析。本库当前本地修订实现实标量 DH1（对应 SHTOOLS `sampling=1` 的等采样网格）与 Gauss–Legendre 网格正反变换，最高 64 阶；经度方向采用直接三角求和，不使用 SHTOOLS 的 FFT 路径，也不提供复球谐、`sampling=2` 网格、SHTOOLS 文件适配器或其全部分析功能。网格采样布局虽可对应，系数约定仍需显式对齐。详细边界见仓库 `docs/shtools-comparison.md`。
 
 `Spectrum::new` 和 `values()` 分别复制输入、输出，调用者不能通过数组修改已验证的系数。`filter_bands` 和卷积要求完整相同阶数，不隐式截断。发生非有限输入、形状错误、数值溢出或拟合秩不足时返回错误。
 
 `fit_weighted(L, directions, values, weights)` 求最小化 `sum w_i*(f_i-y_i)^2`。支持 `L<=12`、最多 4096 行，权重有限且非负。QR 对秩不足返回 `SingularSystem`，不返回伪逆最小范数解。`diagonal_ratio()` 是 QR 对角线比值诊断，不是严格条件数。用于统计拟合的权重和流式投影的立体角权重具有不同含义。
 
-`from_convention` / `to_convention` 显式选择 `Orthonormal`、`FourPi`、`Schmidt`，`CondonShortley` / `PhaseFree`，以及 `Signed`、`Interleaved`、`CosineThenSine` 排列。`FourPi + PhaseFree + Signed` 对应 N3D/ACN，`Schmidt + PhaseFree + Signed` 对应 SN3D/ACN。旧接口 `to_sn3d()` 返回无 CS 相位的 SN3D **展开系数**，不是基函数采样值；打包次序保持不变。JSON 固定格式 `moonharmonics-real-v1`，携带 `orthonormal-cs-l*l+l+m` 约定，拒绝重复键、未知字段及错误形状。可交换格式详情见 [docs/format.md](https://github.com/xubowen1234/moonharmonics/blob/v0.2.0/docs/format.md)，旋转算法、因子方向和排列示例见 [docs/rotations-and-conventions.md](https://github.com/xubowen1234/moonharmonics/blob/v0.2.0/docs/rotations-and-conventions.md)。
+`from_convention` / `to_convention` 显式选择 `Orthonormal`、`FourPi`、`Schmidt`，`CondonShortley` / `PhaseFree`，以及 `Signed`、`Interleaved`、`CosineThenSine` 排列。`FourPi + PhaseFree + Signed` 对应 N3D/ACN，`Schmidt + PhaseFree + Signed` 对应 SN3D/ACN。旧接口 `to_sn3d()` 返回无 CS 相位的 SN3D **展开系数**，不是基函数采样值；打包次序保持不变。JSON 固定格式 `moonharmonics-real-v1`，携带 `orthonormal-cs-l*l+l+m` 约定，拒绝重复键、未知字段及错误形状。格式和旋转资料见仓库 `docs/`。
 
 ## 三个可运行工作流
 
@@ -105,7 +118,7 @@ moon build --target wasm-gc --deny-warn
 moon test --target wasm-gc --deny-warn
 ```
 
-将目标替换为 `wasm`、`js` 或 `native` 可复核其他后端。当前 29 个测试用例。测试包括全部 4225 模式索引、解析一阶/二阶基、64 阶加法定理及反演、Gauss 求积多项式精度、Parseval、独立解析场、旋转相位、SO(3) 逆变换/组合/逐带能量及 64 阶稳定性、18 种约定往返和独立带标记、Poisson 符号、梯度极点极限、病态拟合拒绝、JSON 歧义、溢出和错误输入。测试用例内部遍历大量模式，测试数量不等于数值比较数量。
+将目标替换为 `wasm`、`js` 或 `native` 可复核其他后端。当前 31 个测试用例。测试包括全部 4225 模式索引、解析一阶/二阶基、64 阶加法定理及反演、Gauss 求积多项式精度、DH1 面积与 0/1/4/12/32/64 阶正反变换、Parseval、独立解析场、旋转相位、SO(3) 逆变换/组合/逐带能量及 64 阶稳定性、18 种约定往返和独立带标记、Poisson 符号、梯度极点极限、病态拟合拒绝、JSON 歧义、溢出和错误输入。测试用例内部遍历大量模式，测试数量不等于数值比较数量。
 
 开发验证脚本另外使用 SciPy 作为独立参考（不是运行时依赖）：
 
@@ -114,7 +127,7 @@ python -m pip install numpy==2.3.4 scipy==1.16.3
 python scripts/reference_check.py --target wasm-gc
 ```
 
-它独立比较 64 阶实基、256 节点求积、16 阶正反变换、解析导数、64 阶 Lambertian 系数和带噪声加权拟合，并用独立三维旋转后的 SciPy 球谐验证 64 阶旋转，使用稠密 Padé 矩阵指数对照最高阶系数，逐项验证 18 种约定的导入与导出。每个后端执行 110,707 次标量比较。拟合参考使用 SVD，区别于本库 QR。脚本打印实际比较数量及最大绝对误差；阈值和输入在脚本中固定，不能用一次往返测试替代独立参考。详细输入与实测误差见 [数值验证说明](https://github.com/xubowen1234/moonharmonics/blob/v0.2.0/docs/numerical-validation.md)。
+它独立比较 64 阶实基、256 节点求积、16 阶 Gauss–Legendre 与 DH1 正反变换、解析导数、64 阶 Lambertian 系数和带噪声加权拟合，并用独立三维旋转后的 SciPy 球谐验证 64 阶旋转，使用稠密 Padé 矩阵指数对照最高阶系数，逐项验证 18 种约定的导入与导出。每个后端执行 112,152 次标量比较。拟合参考使用 SVD，区别于本库 QR。脚本打印实际比较数量及最大绝对误差；阈值和输入在脚本中固定，不能用一次往返测试替代独立参考。详细输入与实测误差见仓库 `docs/numerical-validation.md`。
 
 ## 边界、复杂度与许可
 

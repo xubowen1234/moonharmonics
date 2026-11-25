@@ -26,6 +26,17 @@ fn main {
   if smoothed.energy().unwrap() >= source.energy().unwrap() {
     abort("heat energy did not decrease")
   }
+  let dh = @h.DriscollHealyGrid::new(8).unwrap()
+  let dh_spectrum = dh
+    .project(fn(d) {
+      let (_, _, z) = d.cartesian()
+      z
+    })
+    .unwrap()
+  let dh_roundtrip = dh.analyze(dh_spectrum.synthesize_dh(dh).unwrap()).unwrap()
+  if dh_roundtrip.distance(dh_spectrum).unwrap() > 1.0e-12 {
+    abort("Driscoll-Healy transform roundtrip exceeded tolerance")
+  }
   println("Poisson residual: \{residual}")
   println("potential: \{actual}; heat energy: \{smoothed.energy().unwrap()}")
 }

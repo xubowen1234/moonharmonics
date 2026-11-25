@@ -2,28 +2,31 @@
 /// Basis normalization: Orthonormal has unit integral-square per harmonic;
 /// FourPi has integral-square 4pi (phase-free is ambisonic N3D);
 /// Schmidt has integral-square 4pi/(2l+1) (phase-free is ambisonic SN3D).
+#derive(Eq, Debug)
 pub(all) enum Normalization {
   Orthonormal
   FourPi
   Schmidt
-} derive(Eq, Debug)
+}
 
 ///|
 /// Whether odd |m| carries the Condon-Shortley minus sign.
+#derive(Eq, Debug)
 pub(all) enum HarmonicPhase {
   CondonShortley
   PhaseFree
-} derive(Eq, Debug)
+}
 
 ///|
 /// Within each degree, Signed is -l,...,0,...,+l (ACN index l*l+l+m).
 /// Interleaved is 0,+1,-1,+2,-2,...; CosineThenSine is 0,+1,...,+l,-1,...,-l.
 /// These are layouts of complete real bands, not FuMa channel weighting/order.
+#derive(Eq, Debug)
 pub(all) enum CoefficientOrder {
   Signed
   Interleaved
   CosineThenSine
-} derive(Eq, Debug)
+}
 
 ///|
 fn convention_index(l : Int32, m : Int32, order : CoefficientOrder) -> Int32 {
