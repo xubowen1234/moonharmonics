@@ -8,10 +8,10 @@ MoonHarmonics 是 MoonBit 的实球谐分析与谱算子库，用于把单位球
 
 本项目使用 `moonc 0.10.22+124d61d05`，高于最低的 0.10.16。CI 固定同一官方工具链，覆盖 `wasm-gc`、`wasm`、`js`、Linux `native`。JS 运行需要 Node.js；Windows native 需要 MSVC C++ 工具和 Windows SDK。本机缺少该工具链，不能把 Windows native 构建计为本地通过。
 
-MoonCakes 当前已发布 `0.2.0`，包含本文所述 DH1、SO(3) 旋转与约定转换能力。安装命令：
+MoonCakes 当前已发布 `0.2.1`，包含 DH1、SO(3) 旋转与约定转换能力。安装命令：
 
 ```sh
-moon add xubowen1234/moonharmonics@0.2.0
+moon add xubowen1234/moonharmonics@0.2.1
 ```
 
 在消费包的 `moon.pkg` 添加：
