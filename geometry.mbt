@@ -68,9 +68,17 @@ pub fn Direction::from_cartesian(
   let a = x / scale
   let b = y / scale
   let c = z / scale
-  let norm = (a * a + b * b + c * c).sqrt()
-  let cos_theta = @cmp.maximum(-1.0, @cmp.minimum(1.0, c / norm))
-  Direction::new(@math.acos(cos_theta), @math.atan2(b, a))
+  // acos(z / norm) rounds tiny but representable polar inclinations to zero.
+  // Scale the transverse norm separately so even its square cannot underflow.
+  let transverse_scale = @cmp.maximum(a.abs(), b.abs())
+  let transverse = if transverse_scale == 0.0 {
+    0.0
+  } else {
+    let ax = a / transverse_scale
+    let by = b / transverse_scale
+    transverse_scale * (ax * ax + by * by).sqrt()
+  }
+  Direction::new(@math.atan2(transverse, c), @math.atan2(b, a))
 }
 
 ///|

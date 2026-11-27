@@ -6,12 +6,12 @@ MoonHarmonics 是 MoonBit 的实球谐分析与谱算子库，用于把单位球
 
 ## 环境与安装
 
-本项目使用 `moonc 0.10.22+124d61d05`，高于最低的 0.10.16。CI 固定同一官方工具链，覆盖 `wasm-gc`、`wasm`、`js`、Linux `native`。JS 运行需要 Node.js；Windows native 需要 MSVC C++ 工具和 Windows SDK。本机缺少该工具链，不能把 Windows native 构建计为本地通过。
+本项目使用 `moonc 1.0.0-rc1+3c0520448`（`moon` / `moonrun 0.1.20261126`）。CI 固定同一官方工具链，覆盖 `wasm-gc`、`wasm`、`js`、Linux `native`。JS 运行需要 Node.js；Windows native 需要 MSVC C++ 工具和 Windows SDK。本机缺少该工具链，不能把 Windows native 构建计为本地通过。
 
-MoonCakes 当前已发布 `0.2.1`，包含 DH1、SO(3) 旋转与约定转换能力。安装命令：
+本发布版本为 `0.2.2`，包含 DH1、SO(3) 旋转与约定转换能力。发布后可使用以下命令安装：
 
 ```sh
-moon add xubowen1234/moonharmonics@0.2.1
+moon add xubowen1234/moonharmonics@0.2.2
 ```
 
 在消费包的 `moon.pkg` 添加：
@@ -86,7 +86,7 @@ let dh_samples = equiangular_coefficients.synthesize_dh(dh).unwrap()
 
 ### 与 SHTOOLS 的能力对照
 
-SHTOOLS 提供 DH 等角与 Gauss–Legendre 网格的球谐展开/重建，也支持复球谐和更广泛的地学分析。本库当前本地修订实现实标量 DH1（对应 SHTOOLS `sampling=1` 的等采样网格）与 Gauss–Legendre 网格正反变换，最高 64 阶；经度方向采用直接三角求和，不使用 SHTOOLS 的 FFT 路径，也不提供复球谐、`sampling=2` 网格、SHTOOLS 文件适配器或其全部分析功能。网格采样布局虽可对应，系数约定仍需显式对齐。详细边界见仓库 `docs/shtools-comparison.md`。
+SHTOOLS 提供 DH 等角与 Gauss–Legendre 网格的球谐展开/重建，也支持复球谐和更广泛的地学分析。本库实现实标量 DH1（对应 SHTOOLS `sampling=1` 的等采样网格）与 Gauss–Legendre 网格正反变换，最高 64 阶；经度方向采用直接三角求和，不使用 SHTOOLS 的 FFT 路径，也不提供复球谐、`sampling=2` 网格、SHTOOLS 文件适配器或其全部分析功能。网格采样布局虽可对应，系数约定仍需显式对齐。详细边界见仓库 `docs/shtools-comparison.md`。
 
 `Spectrum::new` 和 `values()` 分别复制输入、输出，调用者不能通过数组修改已验证的系数。`filter_bands` 和卷积要求完整相同阶数，不隐式截断。发生非有限输入、形状错误、数值溢出或拟合秩不足时返回错误。
 
@@ -118,7 +118,7 @@ moon build --target wasm-gc --deny-warn
 moon test --target wasm-gc --deny-warn
 ```
 
-将目标替换为 `wasm`、`js` 或 `native` 可复核其他后端。当前 31 个测试用例。测试包括全部 4225 模式索引、解析一阶/二阶基、64 阶加法定理及反演、Gauss 求积多项式精度、DH1 面积与 0/1/4/12/32/64 阶正反变换、Parseval、独立解析场、旋转相位、SO(3) 逆变换/组合/逐带能量及 64 阶稳定性、18 种约定往返和独立带标记、Poisson 符号、梯度极点极限、病态拟合拒绝、JSON 歧义、溢出和错误输入。测试用例内部遍历大量模式，测试数量不等于数值比较数量。
+将目标替换为 `wasm`、`js` 或 `native` 可复核其他后端。当前 33 个测试用例。测试包括全部 4225 模式索引、解析一阶/二阶基、64 阶加法定理及反演、Gauss 求积多项式精度、DH1 面积与 0/1/4/12/32/64 阶正反变换、Parseval、独立解析场、旋转相位、SO(3) 逆变换/组合/逐带能量及 64 阶稳定性、18 种约定往返和独立带标记、Poisson 符号、梯度极点极限、病态拟合拒绝、JSON 歧义、溢出和错误输入。测试用例内部遍历大量模式，测试数量不等于数值比较数量。
 
 开发验证脚本另外使用 SciPy 作为独立参考（不是运行时依赖）：
 

@@ -70,7 +70,12 @@ pub fn Spectrum::from_json_string(
   if text.length() > 2_000_000 {
     return Err(InvalidInput("spectrum JSON exceeds two million UTF-16 units"))
   }
-  let json = @json.parse(text, max_nesting_depth=8, reject_duplicate_keys=true) catch {
+  // Core 1.0 uses a stack-safe parser; its old depth argument no longer rejects
+  // nesting. Preserve this format's input bound before constructing JSON trees.
+  if !spectrum_json_depth_ok(text) {
+    return Err(InvalidInput("spectrum JSON exceeds eight nesting levels"))
+  }
+  let json = @json.parse(text, reject_duplicate_keys=true) catch {
     _ => return Err(InvalidInput("invalid spectrum JSON"))
   }
   Spectrum::from_json(json)
@@ -93,4 +98,33 @@ pub fn Spectrum::to_sn3d(
   self : Spectrum,
 ) -> Result[Array[Double], HarmonicError] {
   self.to_convention(Schmidt, PhaseFree, Signed)
+}
+
+///|
+fn spectrum_json_depth_ok(text : String) -> Bool {
+  let mut depth = 0
+  let mut quoted = false
+  let mut escaped = false
+  for c in text.iter() {
+    if quoted {
+      if escaped {
+        escaped = false
+      } else if c == '\\' {
+        escaped = true
+      } else if c == '"' {
+        quoted = false
+      }
+    } else if c == '"' {
+      quoted = true
+    } else if c == '{' || c == '[' {
+      depth += 1
+      if depth > 8 {
+        return false
+      }
+    } else if c == '}' || c == ']' {
+      depth -= 1
+    }
+  }
+  // Syntax/shape, unmatched braces and unterminated strings are the parser's job.
+  true
 }
